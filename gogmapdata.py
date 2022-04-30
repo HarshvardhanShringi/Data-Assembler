@@ -1,83 +1,133 @@
-from cryptography.fernet import Fernet
-import tkinter
-from tkinter import IntVar
-from tkinter import font
-from tkinter import filedialog
+import tkinter as tk
+from openpyxl import Workbook
+import pyautogui
+import time
+import keyboard
 
 
-def openfile():
-    global filepath
-    filepath=filedialog.askopenfilename()
-    g=tkinter.Label(m,text=filepath)
-    g.pack()
+global res
+time.sleep(3)
+# Creating a workbook file
+wb = Workbook()
 
-def encryption():
-    kfile_path=b'C:\Program Files\Dell\Update\key.txt'
-    g = open(kfile_path, 'rb')
-    k=g.read()
-    token=Fernet(k)
-    orig_file_path=filepath
-    file = open(orig_file_path,'rb')
-    orig_data = file.read()
-    enc_data = token.encrypt(orig_data)
-    file1 = open(orig_file_path, 'wb')
-    file1.write(enc_data)
+# Creating first sheet
+ws=wb.active
 
-def decryption():
-    kfile_path=b'C:\Program Files\Dell\Update\key.txt'
-    g = open(kfile_path, 'rb')
-    k=g.read()
-    token=Fernet(k)
-    dec_file_path=filepath
-    file2= open(dec_file_path, 'rb')
-    enc_data = file2.read()
-    dec_data = token.decrypt(enc_data)
-    file3 = open(dec_file_path, 'wb')
-    file3.write(dec_data)
+# Saving workbook with name
+wb.save(filename = 'sample.xlsx')
 
 
+# # Writing Headings of sheet
+ws['A1']='S. No.'
+ws['B1']='Name'
+ws['C1']='Address'
+ws['D1']='Phone No.'
+ws['E1']='Rating'
 
-def isbutton_checked():
-    e_text = namvar.get()
-    if CheckVar2==1 and e_text=='hukum':
-        encryption()
-        gg=tkinter.Label(m,text='encryption successfull')
-        gg.pack(side='top')
-    if CheckVar1==1 and e_text=='hukum':
-        decryption()
-        gg1 = tkinter.Label(m, text='decryption successfull')
-        gg1.pack(side='top')
+wb.save(filename = 'sample.xlsx')
 
-# main window
-m=tkinter.Tk()
-m.geometry('1600x1000')
-m.title('practise')
+# Part 1- Opening 'view all'
+pyautogui.moveTo(671, 130, duration=0.5)
+pyautogui.scroll(-650)
+pyautogui.moveTo(672, 591, duration=0.5)
+pyautogui.click(x=672, y=591, clicks=1, interval=0, button='left')
 
-
-# buttons
-but=tkinter.Button(m,activebackground='cyan',text='Start',command=isbutton_checked,width=14,height=1,font=15,bd=6,bg='white')
-but.pack(side='bottom',pady=150)
-but2=tkinter.Button(m,activebackground='cyan',command=openfile,text='select file',width=14,height=1,font=10,bd=2,bg='white')
-but2.pack(side='top',pady=60,padx=30)
-
-# entry
-namvar=tkinter.StringVar()
-
-entry=tkinter.Entry(m,width=30,textvariable=namvar)
-entry.pack(side='bottom',pady=0)
+i=0
 
 
-
-# checkbutton
-CheckVar1 = IntVar()
-CheckVar2 = IntVar()
-myFont = font.Font(size=12)
-C1 = tkinter.Checkbutton(m, text = "Decryption", variable = CheckVar1,offvalue=0,onvalue=1, height=0,width = 20,font=myFont)
-C2 = tkinter.Checkbutton(m, text = "Encryption", variable = CheckVar2,offvalue=0,onvalue=1, height=0,width = 20,font=myFont)
-C1.pack(side='bottom',pady=60)
-C2.pack(side='bottom',pady=0)
+# Part 3- Getting data of shops
 
 
+def pls(i):
+    # Part 2- Opening shop 1
+    pyautogui.moveTo(81, 355, duration=1)
+    time.sleep(4)
+    pyautogui.click(x=81, y=355, clicks=1, interval=0, button='left')
+
+    end_block = None
+    while end_block==None:
+
+        root = tk.Tk()
+        # Name pos = (549,379)
+        pyautogui.moveTo(549, 379, duration=1)
+        pyautogui.dragTo(1123, 442, duration=0.5)
+        pyautogui.hotkey('ctrl', 'c')
+        paste = root.clipboard_get()
+        ws['B'+str(i)]=paste
+
+        # # Rating pos =(551,482)
+        root = tk.Tk()
+        pyautogui.click(546, 483, clicks=1, interval=0, button='left')
+        rat_pos = pyautogui.locateCenterOnScreen('gogrev.png')
+        if rat_pos != None:
+            pyautogui.moveTo(rat_pos[0] - 200, rat_pos[1], duration=0.5)
+            pyautogui.dragTo(rat_pos[0] - 167, rat_pos[1], duration=0.5)
+            pyautogui.hotkey('ctrl', 'c')
+            paste = root.clipboard_get()
+            if len(paste)<6:
+                ws['E' + str(i)] = paste
+            else:
+                ws['E' + str(i)] = 'Null'
+
+        else:
+            root = tk.Tk()
+            pyautogui.click(546, 483, clicks=1, interval=0, button='left')
+            pyautogui.moveTo(546, 483, duration=1)
+            pyautogui.dragTo(582, 483, duration=0.5)
+            pyautogui.hotkey('ctrl', 'c')
+            paste = root.clipboard_get()
+            ws['E'+str(i)]=paste
+            if len(paste)<6:
+                ws['E' + str(i)] = paste
+            else:
+                ws['E' + str(i)] = 'Null'
 
 
-m.mainloop()
+        # # Address pos=(1162,617)
+        root = tk.Tk()
+        add_pos=pyautogui.locateCenterOnScreen('address.png')
+        x_dif = 573
+        y_dif = 36
+        # (x=1162, y=643)
+        if add_pos!=None:
+            paste = None
+            pyautogui.moveTo(add_pos[0] + 40, add_pos[1], duration=0.5)
+            pyautogui.dragTo(add_pos[0] + 573, add_pos[1] + 36, duration=0.5)
+            pyautogui.hotkey('ctrl', 'c')
+            paste = root.clipboard_get()
+            ws['C'+str(i)]=paste
+        else:
+            ws['C' + str(i)] = 'Null'
+
+
+        # # Phone pos=(614,681)
+        root = tk.Tk()
+        phone_pos = pyautogui.locateCenterOnScreen('phone.png')
+        if phone_pos != None:
+            paste=None
+            pyautogui.moveTo(phone_pos[0] + 34, phone_pos[1], duration=0.5)
+            pyautogui.dragTo(phone_pos[0] + 200, phone_pos[1], duration=0.5)
+            pyautogui.hotkey('ctrl', 'c')
+            paste = root.clipboard_get()
+            ws['D' + str(i)] = paste
+        else:
+            ws['D'+str(i)]='Null'
+
+        wb.save(filename='sample.xlsx')
+
+
+        i=i+1
+
+        # scroll pos= (512,401)
+        pyautogui.moveTo(212, 399, duration=0.2)
+        pyautogui.scroll(-160)
+        pyautogui.click(x=190, y=440, clicks=1, interval=0, button='left')
+        pyautogui.click(x=190, y=440, clicks=1, interval=0, button='left')
+        if keyboard.is_pressed("q"):
+            return pls(i+1)
+        else:
+            pass
+
+
+pls(2)
+
